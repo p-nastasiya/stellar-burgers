@@ -20,7 +20,7 @@ export const RegisterUI: FC<RegisterUIProps> = ({
 }) => (
   <main className={styles.container}>
     <div className={`pt-6 ${styles.wrapCenter}`}>
-      <h3 className='pb-6 text text_type_main-medium'>Регистрация</h3>
+      <h3 className='pb-6 text text-type-main-medium'>Регистрация</h3>
       <form
         className={`pb-15 ${styles.form}`}
         name='register'
@@ -37,6 +37,8 @@ export const RegisterUI: FC<RegisterUIProps> = ({
               error={false}
               errorText=''
               size='default'
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
             />
           </div>
           <div className='pb-6'>
@@ -49,6 +51,8 @@ export const RegisterUI: FC<RegisterUIProps> = ({
               error={false}
               errorText=''
               size={'default'}
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
             />
           </div>
           <div className='pb-6'>

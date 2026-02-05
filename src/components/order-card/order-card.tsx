@@ -1,6 +1,7 @@
 import { FC, memo, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
-
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from '../../services/store';
+import { ingredientsSelector } from '@selectors';
 import { OrderCardProps } from './type';
 import { TIngredient } from '@utils-types';
 import { OrderCardUI } from '../ui/order-card';
@@ -9,9 +10,8 @@ const maxIngredients = 6;
 
 export const OrderCard: FC<OrderCardProps> = memo(({ order }) => {
   const location = useLocation();
-
-  /** TODO: взять переменную из стора */
-  const ingredients: TIngredient[] = [];
+  const navigate = useNavigate();
+  const ingredients = useSelector(ingredientsSelector);
 
   const orderInfo = useMemo(() => {
     if (!ingredients.length) return null;
@@ -45,6 +45,17 @@ export const OrderCard: FC<OrderCardProps> = memo(({ order }) => {
     };
   }, [order, ingredients]);
 
+  const handleClick = () => {
+    // Определяем правильный путь в зависимости от текущего location
+    const basePath = location.pathname.includes('/profile')
+      ? '/profile/orders'
+      : '/feed';
+
+    navigate(`${basePath}/${order.number}`, {
+      state: { background: location }
+    });
+  };
+
   if (!orderInfo) return null;
 
   return (
@@ -52,6 +63,7 @@ export const OrderCard: FC<OrderCardProps> = memo(({ order }) => {
       orderInfo={orderInfo}
       maxIngredients={maxIngredients}
       locationState={{ background: location }}
+      onClick={handleClick}
     />
   );
 });

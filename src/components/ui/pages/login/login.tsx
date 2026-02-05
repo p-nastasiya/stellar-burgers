@@ -18,7 +18,7 @@ export const LoginUI: FC<LoginUIProps> = ({
 }) => (
   <main className={styles.container}>
     <div className={`pt-6 ${styles.wrapCenter}`}>
-      <h3 className='pb-6 text text_type_main-medium'>Вход</h3>
+      <h3 className='pb-6 text text-type-main-medium'>Вход</h3>
       <form
         className={`pb-15 ${styles.form}`}
         name='login'
@@ -35,6 +35,8 @@ export const LoginUI: FC<LoginUIProps> = ({
               error={false}
               errorText=''
               size='default'
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
             />
           </div>
           <div className='pb-6'>
