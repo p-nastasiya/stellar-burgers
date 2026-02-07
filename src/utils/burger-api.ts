@@ -1,11 +1,8 @@
 import { setCookie, getCookie } from './cookie';
 import { TIngredient, TOrder, TOrdersData, TUser } from './types';
 
-const URL =
-  process.env.REACT_APP_BURGER_API_URL ||
-  'https://norma.education-services.ru/api';
-
-console.log('API URL is now:', URL); // Должно показывать URL
+const URL = process.env.BURGER_API_URL;
+console.log('API URL is now:', URL);
 
 const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
@@ -42,22 +39,37 @@ export const refreshToken = (): Promise<TRefreshResponse> =>
 export const fetchWithRefresh = async <T>(
   url: RequestInfo,
   options: RequestInit
-) => {
+): Promise<T> => {
   try {
     const res = await fetch(url, options);
     return await checkResponse<T>(res);
-  } catch (err) {
-    if ((err as { message: string }).message === 'jwt expired') {
-      const refreshData = await refreshToken();
-      if (options.headers) {
-        (options.headers as { [key: string]: string }).authorization =
-          refreshData.accessToken;
+  } catch (err: any) {
+    const errorMessage = err.message || '';
+    if (
+      errorMessage.includes('jwt') ||
+      errorMessage.includes('401') ||
+      errorMessage.includes('token')
+    ) {
+      try {
+        const refreshData = await refreshToken();
+
+        const newOptions: RequestInit = {
+          ...options,
+          headers: {
+            ...options.headers,
+            authorization: refreshData.accessToken
+          }
+        };
+
+        const res = await fetch(url, newOptions);
+        return await checkResponse<T>(res);
+      } catch (refreshErr) {
+        localStorage.removeItem('refreshToken');
+        document.cookie = 'accessToken=; Max-Age=-1; path=/';
+        throw refreshErr;
       }
-      const res = await fetch(url, options);
-      return await checkResponse<T>(res);
-    } else {
-      return Promise.reject(err);
     }
+    throw err;
   }
 };
 
@@ -77,10 +89,19 @@ type TOrdersResponse = TServerResponse<{
 
 export const getIngredientsApi = () =>
   fetch(`${URL}/ingredients`)
-    .then((res) => checkResponse<TIngredientsResponse>(res))
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      return res.json();
+    })
     .then((data) => {
       if (data?.success) return data.data;
-      return Promise.reject(data);
+      throw new Error('Неверный формат данных от сервера');
+    })
+    .catch((error) => {
+      console.error('Ошибка при загрузке ингредиентов:', error);
+      throw error; // Передаем ошибку дальше
     });
 
 export const getFeedsApi = () =>

@@ -14,7 +14,7 @@ import {
 } from '@pages';
 import { AppHeader } from '../app-header';
 
-const AppRouter: React.FC = () => {
+const AppRouter = () => {
   const location = useLocation();
   const background = location.state?.background;
 

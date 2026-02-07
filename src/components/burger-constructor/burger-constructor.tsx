@@ -1,30 +1,41 @@
 import { FC, useMemo } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
+import { useNavigate } from 'react-router-dom';
 import {
   constructorBunSelector,
   constructorIngredientsSelector,
   orderSelector,
   orderLoadingSelector,
-  orderModalDataSelector
-} from '@selectors';
+  orderModalDataSelector,
+  userSelector
+} from '../../services/selectors';
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
 import {
-  clearConstructor,
   clearOrder,
   createOrder,
   setOrderModalData
-} from '@slices';
+} from '../../services/slices/orderSlice';
+import { clearConstructor } from '../../services/slices/constructorSlice';
 
 export const BurgerConstructor: FC = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const bun = useSelector(constructorBunSelector);
   const ingredients = useSelector(constructorIngredientsSelector);
   const order = useSelector(orderSelector);
   const orderRequest = useSelector(orderLoadingSelector);
   const orderModalData = useSelector(orderModalDataSelector);
+  const user = useSelector(userSelector);
 
   const onOrderClick = () => {
+    // Проверяем авторизацию
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
     if (!bun || orderRequest) return;
 
     const ingredientIds = [
@@ -33,12 +44,15 @@ export const BurgerConstructor: FC = () => {
       bun._id
     ];
 
-    dispatch(createOrder(ingredientIds)).then((action: { payload: any }) => {
-      if (createOrder.fulfilled.match(action)) {
-        dispatch(setOrderModalData(action.payload));
+    dispatch(createOrder(ingredientIds))
+      .unwrap()
+      .then((orderData) => {
+        dispatch(setOrderModalData(orderData));
         dispatch(clearConstructor());
-      }
-    });
+      })
+      .catch((error) => {
+        console.error('Ошибка создания заказа:', error);
+      });
   };
 
   const closeOrderModal = () => {

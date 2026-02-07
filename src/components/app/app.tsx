@@ -1,8 +1,7 @@
 import React, { useEffect, FC } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import { fetchIngredients } from '@actions';
-import { fetchUser } from '@slices/userSlice';
-import { ingredientsLoadingSelector, isAuthCheckedSelector } from '@selectors';
+import { fetchUser, setAuthChecked } from '@slices/userSlice';
 
 import '../../index.css';
 import styles from './app.module.css';
@@ -30,7 +29,8 @@ import { ConstructorPage } from '../../pages/constructor-page/constructor-page';
 import { Modal } from '@components';
 import { IngredientDetails } from '@components';
 import { OrderInfo } from '@components';
-import { Preloader } from '@ui';
+//import { Preloader } from '@ui';
+//import { ingredientsLoadingSelector, isAuthCheckedSelector } from '@selectors';
 
 // Компонент для отображения ингредиента в модалке
 const IngredientDetailsModal: FC = () => {
@@ -63,33 +63,44 @@ const OrderInfoModal: FC = () => {
 };
 
 // Компонент-обертка для отображения прелоадера
-const AppLoader: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const isLoading = useSelector(ingredientsLoadingSelector);
-  const isAuthChecked = useSelector(isAuthCheckedSelector);
+//const AppLoader: FC<{ children: React.ReactNode }> = ({ children }) => {
 
-  // Показываем прелоадер, пока загружаются ингредиенты или проверяется авторизация
-  if (isLoading || !isAuthChecked) {
-    return <Preloader />;
-  }
+// Показываем прелоадер, пока загружаются ингредиенты или проверяется авторизация
 
-  return <>{children}</>;
-};
+//   return <>{children}</>;
+// };
 
 // Внутренний компонент App
 const AppContent = () => {
   const location = useLocation();
   const background = location.state?.background;
+  const dispatch = useDispatch();
+  //const isLoading = useSelector(ingredientsLoadingSelector);
 
+  useEffect(() => {
+    dispatch(fetchIngredients())
+      .unwrap()
+      .catch((error) => {
+        console.error('Ошибка загрузки ингредиентов:', error);
+        setApiError(
+          'Не удалось загрузить ингредиенты. Проверьте подключение к интернету.'
+        );
+      });
+  }, [dispatch]);
+
+  // if (isLoading) {
+  //   return <Preloader />;
+  // }
   return (
     <div className={styles.app}>
       <AppHeader />
       <Routes location={background || location}>
         <Route path='/' element={<ConstructorPage />} />
         {/* {/* Основные публичные маршруты */}
-        {/*<Route path='/feed' element={<Feed />} /> */}
+        <Route path='/feed' element={<Feed />} />
 
         {/* Маршруты для неавторизованных пользователей (только для гостей) */}
-        {/*<Route
+        <Route
           path='/login'
           element={
             <OnlyUnAuth>
@@ -120,10 +131,10 @@ const AppContent = () => {
               <ResetPassword />
             </OnlyUnAuth>
           }
-        /> */}
+        />
 
         {/* Маршруты для авторизованных пользователей (требуют аутентификации) */}
-        {/*<Route
+        <Route
           path='/profile'
           element={
             <OnlyAuth>
@@ -138,10 +149,10 @@ const AppContent = () => {
               <ProfileOrders />
             </OnlyAuth>
           }
-        /> */}
+        />
 
         {/* Детальные страницы (могут открываться как отдельные страницы) */}
-        {/*<Route path='/ingredients/:id' element={<IngredientDetails />} />
+        <Route path='/ingredients/:id' element={<IngredientDetails />} />
         <Route path='/feed/:number' element={<OrderInfo />} />
         <Route
           path='/profile/orders/:number'
@@ -150,18 +161,18 @@ const AppContent = () => {
               <OrderInfo />
             </OnlyAuth>
           }
-        /> */}
+        />
 
         {/* Резервный маршрут для 404 ошибки */}
-        {/*<Route path='*' element={<NotFound404 />} />*/}
+        <Route path='*' element={<NotFound404 />} />
       </Routes>
 
       {/* Модальные окна, которые отображаются поверх основного контента 
     при наличии фона (background) из истории навигации */}
-      {/*{background && (
-        <Routes>*/}
-      {/* Те же маршруты, но с модальными версиями компонентов */}
-      {/*<Route path='/ingredients/:id' element={<IngredientDetailsModal />} />
+      {background && (
+        <Routes>
+          {/* Те же маршруты, но с модальными версиями компонентов */}
+          <Route path='/ingredients/:id' element={<IngredientDetailsModal />} />
           <Route path='/feed/:number' element={<OrderInfoModal />} />
           <Route
             path='/profile/orders/:number'
@@ -172,29 +183,19 @@ const AppContent = () => {
             }
           />
         </Routes>
-      )}*/}
+      )}
     </div>
   );
 };
 
 // Главный компонент App
-const App = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    // Загружаем ингредиенты при старте приложения
-    dispatch(fetchIngredients());
-    // Проверяем авторизацию пользователя
-    dispatch(fetchUser());
-  }, [dispatch]);
-
-  return (
-    <BrowserRouter>
-      <AppLoader>
-        <AppContent />
-      </AppLoader>
-    </BrowserRouter>
-  );
-};
+const App = () => (
+  <BrowserRouter>
+    <AppContent />
+  </BrowserRouter>
+);
 
 export default App;
+function setApiError(arg0: string) {
+  throw new Error('Function not implemented.');
+}

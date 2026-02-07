@@ -29,5 +29,11 @@
       "@actions": ["src/services/actions"], "@actions/*": ["src/services/actions/*"]
     }
   },
-  "include": ["src"]
+  "include": [
+    "src/**/*",
+    "global.d.ts", // или ваш путь к файлу
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": ["node_modules"]
 }

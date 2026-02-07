@@ -8,8 +8,9 @@ export const fetchIngredients = createAsyncThunk(
     try {
       const data = await getIngredientsApi();
       return data;
-    } catch (error) {
-      return rejectWithValue(error);
+    } catch (error: any) {
+      // Вместо передачи всего error (который несериализуем), передаем строку
+      return rejectWithValue(error.message || 'Ошибка загрузки ингредиентов');
     }
   }
 );

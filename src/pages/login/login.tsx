@@ -1,19 +1,47 @@
-import { FC, SyntheticEvent, useState } from 'react';
+import { FC, SyntheticEvent, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
-import { userErrorSelector } from '@selectors';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { loginUser } from '../../services/slices/userSlice';
+import {
+  userSelector,
+  userErrorSelector,
+  userLoadingSelector
+} from '../../services/selectors';
 import { LoginUI } from '@ui-pages';
-import { loginUser } from '@slices';
 
 export const Login: FC = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const user = useSelector(userSelector);
   const error = useSelector(userErrorSelector);
+  //const isLoading = useSelector(userLoadingSelector);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Очищаем ошибку при размонтировании
+  // useEffect(
+  //   () => () => {
+  //     dispatch(clearError());
+  //   },
+  //   [dispatch]
+  // );
+
+  // Перенаправляем если пользователь уже авторизован
+  useEffect(() => {
+    if (user) {
+      const from = location.state?.from || { pathname: '/' };
+      navigate(from.pathname, { replace: true });
+    }
+  }, [user, navigate, location]);
+
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    dispatch(loginUser({ email, password }));
+    if (email && password) {
+      dispatch(loginUser({ email, password }));
+    }
   };
 
   return (

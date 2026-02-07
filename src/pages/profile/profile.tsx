@@ -1,50 +1,61 @@
+import { FC, SyntheticEvent, useState, useEffect, useMemo } from 'react';
 import { ProfileUI } from '@ui-pages';
-import { FC, SyntheticEvent, useEffect, useState } from 'react';
+import { useSelector } from '../../services/store';
+import { userSelector } from '../../services/selectors';
 
 export const Profile: FC = () => {
-  /** TODO: взять переменную из стора */
-  const user = {
-    name: '',
-    email: ''
-  };
+  const user = useSelector(userSelector);
 
+  // Состояние формы
   const [formValue, setFormValue] = useState({
-    name: user.name,
-    email: user.email,
+    name: '',
+    email: '',
     password: ''
   });
 
+  // Обновляем форму только один раз при загрузке пользователя
   useEffect(() => {
-    setFormValue((prevState) => ({
-      ...prevState,
-      name: user?.name || '',
-      email: user?.email || ''
-    }));
-  }, [user]);
+    if (user && (!formValue.name || !formValue.email)) {
+      setFormValue({
+        name: user.name,
+        email: user.email,
+        password: ''
+      });
+    }
+  }, [user]); // user - единственная зависимость
 
-  const isFormChanged =
-    formValue.name !== user?.name ||
-    formValue.email !== user?.email ||
-    !!formValue.password;
+  // Проверяем, изменилась ли форма
+  const isFormChanged = useMemo(() => {
+    if (!user) return false;
+    return (
+      formValue.name !== user.name ||
+      formValue.email !== user.email ||
+      !!formValue.password
+    );
+  }, [formValue, user]);
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
+    // TODO: добавить логику сохранения
+    console.log('Сохранение данных:', formValue);
   };
 
   const handleCancel = (e: SyntheticEvent) => {
     e.preventDefault();
-    setFormValue({
-      name: user.name,
-      email: user.email,
-      password: ''
-    });
+    if (user) {
+      setFormValue({
+        name: user.name,
+        email: user.email,
+        password: ''
+      });
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormValue((prevState) => ({
-      ...prevState,
+    setFormValue({
+      ...formValue,
       [e.target.name]: e.target.value
-    }));
+    });
   };
 
   return (
@@ -56,6 +67,4 @@ export const Profile: FC = () => {
       handleInputChange={handleInputChange}
     />
   );
-
-  return null;
 };
