@@ -3,11 +3,10 @@ import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector
 } from '../../services/hooks';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   constructorBunSelector,
   constructorIngredientsSelector,
-  orderSelector,
   orderLoadingSelector,
   orderModalDataSelector,
   userSelector
@@ -15,27 +14,30 @@ import {
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
 import {
-  clearOrder,
   createOrder,
   setOrderModalData
 } from '../../services/slices/orderSlice';
-import { clearConstructor } from '../../services/slices/constructorSlice';
+import {
+  clearConstructor,
+  moveIngredientDown,
+  moveIngredientUp,
+  removeIngredient
+} from '../../services/slices/constructorSlice';
 
 export const BurgerConstructor: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const bun = useSelector(constructorBunSelector);
   const ingredients = useSelector(constructorIngredientsSelector);
-  const order = useSelector(orderSelector);
   const orderRequest = useSelector(orderLoadingSelector);
   const orderModalData = useSelector(orderModalDataSelector);
   const user = useSelector(userSelector);
 
   const onOrderClick = () => {
-    // Проверяем авторизацию
     if (!user) {
-      navigate('/login');
+      navigate('/login', { state: { from: location } });
       return;
     }
 
@@ -60,7 +62,23 @@ export const BurgerConstructor: FC = () => {
 
   const closeOrderModal = () => {
     dispatch(setOrderModalData(null));
-    dispatch(clearOrder());
+  };
+
+  // Функции для работы с ингредиентами
+  const handleMoveUp = (index: number) => {
+    if (index > 0) {
+      dispatch(moveIngredientUp(index));
+    }
+  };
+
+  const handleMoveDown = (index: number) => {
+    if (index < ingredients.length - 1) {
+      dispatch(moveIngredientDown(index));
+    }
+  };
+
+  const handleClose = (id: string) => {
+    dispatch(removeIngredient(id));
   };
 
   const price = useMemo(

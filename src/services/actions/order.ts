@@ -1,4 +1,3 @@
-// Замените весь файл на:
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { orderBurgerApi, getOrderByNumberApi } from '@api';
 

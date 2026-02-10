@@ -20,7 +20,8 @@ const constructorSlice = createSlice({
     addIngredient: (state, action: PayloadAction<TIngredient>) => {
       const newIngredient: TConstructorIngredient = {
         ...action.payload,
-        id: uuidv4()
+        id: uuidv4(),
+        __v: 0
       };
       state.ingredients.push(newIngredient);
     },

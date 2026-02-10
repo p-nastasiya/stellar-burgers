@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { BurgerConstructorElementUI } from '@ui';
 import type { Meta, StoryObj } from '@storybook/react';
 import { totalmem } from 'os';
@@ -30,7 +31,8 @@ export const DefaultElement: Story = {
       price: 123,
       image: '',
       image_large: '',
-      image_mobile: ''
+      image_mobile: '',
+      __v: 0
     },
     index: 0,
     totalItems: 1,

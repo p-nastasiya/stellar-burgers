@@ -11,3 +11,11 @@ export {
   forgotPassword,
   resetPassword
 } from './user';
+export {
+  addBun,
+  addIngredient,
+  removeIngredient,
+  moveIngredientUp,
+  moveIngredientDown,
+  clearConstructor
+} from '../slices/constructorSlice';

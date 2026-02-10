@@ -11,12 +11,20 @@ const ProtectedRoute = ({ children, onlyUnAuth = false }) => {
   const user = useSelector((state) => state.user.user);
   const location = useLocation();
 
-  // Если авторизация еще не проверена, просто отмечаем это
   useEffect(() => {
-    if (!isAuthChecked) {
+    const token = localStorage.getItem('refreshToken');
+    if (token && !isAuthChecked && !user) {
+      dispatch(fetchUser())
+        .unwrap()
+        .catch(() => {
+          // Если не удалось получить пользователя, помечаем как проверенное
+          dispatch(setAuthChecked(true));
+        });
+    } else if (!token && !isAuthChecked) {
+      // Если нет токена, сразу помечаем как проверенное
       dispatch(setAuthChecked(true));
     }
-  }, [dispatch, isAuthChecked]);
+  }, [dispatch, isAuthChecked, user]);
 
   // Показываем прелоадер, пока проверяется авторизация
   if (!isAuthChecked) {

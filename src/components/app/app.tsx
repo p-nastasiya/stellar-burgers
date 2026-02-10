@@ -1,10 +1,10 @@
-import React, { useEffect, FC } from 'react';
+import React, { useEffect, FC, useState } from 'react';
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector
 } from '../../services/hooks';
 import { fetchIngredients } from '@actions';
-//import { fetchUser, setAuthChecked } from '@slices/userSlice';
+import { fetchUser, setAuthChecked } from '@slices/userSlice';
 
 import '../../index.css';
 import styles from './app.module.css';
@@ -65,20 +65,13 @@ const OrderInfoModal: FC = () => {
   );
 };
 
-// Компонент-обертка для отображения прелоадера
-//const AppLoader: FC<{ children: React.ReactNode }> = ({ children }) => {
-
-// Показываем прелоадер, пока загружаются ингредиенты или проверяется авторизация
-
-//   return <>{children}</>;
-// };
-
 // Внутренний компонент App
 const AppContent = () => {
   const location = useLocation();
   const background = location.state?.background;
   const dispatch = useDispatch();
   //const isLoading = useSelector(ingredientsLoadingSelector);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(fetchIngredients())
@@ -86,14 +79,18 @@ const AppContent = () => {
       .catch((error) => {
         console.error('Ошибка загрузки ингредиентов:', error);
         setApiError(
-          'Не удалось загрузить ингредиенты. Проверьте подключение к интернету.'
+          'Не удалось загрузить ингредиентов. Проверьте подключение к интернету.'
         );
       });
-  }, [dispatch]);
 
-  // if (isLoading) {
-  //   return <Preloader />;
-  // }
+    // Проверяем авторизацию при загрузке
+    const token = localStorage.getItem('refreshToken');
+    if (token) {
+      dispatch(fetchUser());
+    } else {
+      dispatch(setAuthChecked(true));
+    }
+  }, [dispatch]);
   return (
     <div className={styles.app}>
       <AppHeader />
@@ -199,6 +196,6 @@ const App = () => (
 );
 
 export default App;
-function setApiError(arg0: string) {
-  throw new Error('Function not implemented.');
-}
+// function setApiError(arg0: string) {
+//   throw new Error('Function not implemented.');
+// }
