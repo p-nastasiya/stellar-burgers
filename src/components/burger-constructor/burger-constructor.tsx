@@ -1,5 +1,8 @@
 import { FC, useMemo } from 'react';
-import { useDispatch, useSelector } from '../../services/store';
+import {
+  useAppDispatch as useDispatch,
+  useAppSelector as useSelector
+} from '../../services/hooks';
 import { useNavigate } from 'react-router-dom';
 import {
   constructorBunSelector,

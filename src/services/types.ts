@@ -1,9 +1,9 @@
-import { TIngredient, TOrder, TUser } from '@utils-types';
-
-// Тип для ингредиента в конструкторе
-export type TConstructorIngredient = TIngredient & {
-  id: string;
-};
+import {
+  TIngredient,
+  TOrder,
+  TUser,
+  TConstructorIngredient
+} from '@utils-types';
 
 // Тип для состояния ингредиентов
 export type TIngredientsState = {
@@ -34,6 +34,7 @@ export type TUserState = {
   isLoading: boolean;
   error: string | null;
   isAuthChecked: boolean;
+  orders: TOrder[];
 };
 
 // Тип для состояния ленты заказов
@@ -53,3 +54,5 @@ export type RootState = {
   user: TUserState;
   feed: TFeedState;
 };
+export type { TConstructorIngredient };
+

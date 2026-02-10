@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from '../services/store';
-import { isAuthCheckedSelector, userSelector } from '../services/selectors';
+import { isAuthCheckedSelector } from '../services/selectors';
 import { fetchUser, setAuthChecked } from '../services/slices/userSlice';
 import { Preloader } from '@ui';
 
 const ProtectedRoute = ({ children, onlyUnAuth = false }) => {
   const dispatch = useDispatch();
   const isAuthChecked = useSelector(isAuthCheckedSelector);
-  const user = useSelector(userSelector);
+  const user = useSelector((state) => state.user.user);
   const location = useLocation();
 
   // Если авторизация еще не проверена, просто отмечаем это

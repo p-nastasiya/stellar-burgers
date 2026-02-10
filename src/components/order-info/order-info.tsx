@@ -1,6 +1,6 @@
 import { FC, useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSelector } from '../../services/store';
+import { useSelector } from '../../services';
 import { ingredientsSelector } from '@selectors';
 import { getOrderByNumberApi } from '@api';
 import { OrderInfoUI } from '@ui';
@@ -22,7 +22,11 @@ export const OrderInfo: FC = () => {
         // Запрашиваем заказ с API
         if (number) {
           const response = await getOrderByNumberApi(parseInt(number, 10));
-          if (response.orders && response.orders.length > 0) {
+          if (
+            response.success &&
+            response.orders &&
+            response.orders.length > 0
+          ) {
             orderData = response.orders[0];
           }
         }

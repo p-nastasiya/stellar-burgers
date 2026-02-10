@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 import { BurgerConstructorElementUI } from '@ui';
 import { BurgerConstructorElementProps } from './type';
-import { useDispatch } from 'src/services';
+import { useDispatch } from '../../services';
 import {
   moveIngredientDown,
   moveIngredientUp,

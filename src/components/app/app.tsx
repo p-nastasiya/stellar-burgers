@@ -1,7 +1,10 @@
 import React, { useEffect, FC } from 'react';
-import { useDispatch, useSelector } from '../../services/store';
+import {
+  useAppDispatch as useDispatch,
+  useAppSelector as useSelector
+} from '../../services/hooks';
 import { fetchIngredients } from '@actions';
-import { fetchUser, setAuthChecked } from '@slices/userSlice';
+//import { fetchUser, setAuthChecked } from '@slices/userSlice';
 
 import '../../index.css';
 import styles from './app.module.css';

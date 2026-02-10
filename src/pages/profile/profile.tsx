@@ -1,6 +1,6 @@
 import { FC, SyntheticEvent, useState, useEffect, useMemo } from 'react';
 import { ProfileUI } from '@ui-pages';
-import { useSelector } from '../../services/store';
+import { useSelector } from '../../services';
 import { userSelector } from '../../services/selectors';
 
 export const Profile: FC = () => {

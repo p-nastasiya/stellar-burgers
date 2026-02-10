@@ -1,8 +1,7 @@
 import { setCookie, getCookie } from './cookie';
-import { TIngredient, TOrder, TOrdersData, TUser } from './types';
+import { TIngredient, TOrder, TUser } from './types';
 
 const URL = process.env.BURGER_API_URL;
-console.log('API URL is now:', URL);
 
 const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
@@ -39,37 +38,22 @@ export const refreshToken = (): Promise<TRefreshResponse> =>
 export const fetchWithRefresh = async <T>(
   url: RequestInfo,
   options: RequestInit
-): Promise<T> => {
+) => {
   try {
     const res = await fetch(url, options);
     return await checkResponse<T>(res);
-  } catch (err: any) {
-    const errorMessage = err.message || '';
-    if (
-      errorMessage.includes('jwt') ||
-      errorMessage.includes('401') ||
-      errorMessage.includes('token')
-    ) {
-      try {
-        const refreshData = await refreshToken();
-
-        const newOptions: RequestInit = {
-          ...options,
-          headers: {
-            ...options.headers,
-            authorization: refreshData.accessToken
-          }
-        };
-
-        const res = await fetch(url, newOptions);
-        return await checkResponse<T>(res);
-      } catch (refreshErr) {
-        localStorage.removeItem('refreshToken');
-        document.cookie = 'accessToken=; Max-Age=-1; path=/';
-        throw refreshErr;
+  } catch (err) {
+    if ((err as { message: string }).message === 'jwt expired') {
+      const refreshData = await refreshToken();
+      if (options.headers) {
+        (options.headers as { [key: string]: string }).authorization =
+          refreshData.accessToken;
       }
+      const res = await fetch(url, options);
+      return await checkResponse<T>(res);
+    } else {
+      return Promise.reject(err);
     }
-    throw err;
   }
 };
 
@@ -84,24 +68,15 @@ type TFeedsResponse = TServerResponse<{
 }>;
 
 type TOrdersResponse = TServerResponse<{
-  data: TOrder[];
+  orders: TOrder[];
 }>;
 
 export const getIngredientsApi = () =>
   fetch(`${URL}/ingredients`)
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      return res.json();
-    })
+    .then((res) => checkResponse<TIngredientsResponse>(res))
     .then((data) => {
       if (data?.success) return data.data;
-      throw new Error('Неверный формат данных от сервера');
-    })
-    .catch((error) => {
-      console.error('Ошибка при загрузке ингредиентов:', error);
-      throw error; // Передаем ошибку дальше
+      return Promise.reject(data);
     });
 
 export const getFeedsApi = () =>
@@ -113,7 +88,7 @@ export const getFeedsApi = () =>
     });
 
 export const getOrdersApi = () =>
-  fetchWithRefresh<TFeedsResponse>(`${URL}/orders`, {
+  fetchWithRefresh<TOrdersResponse>(`${URL}/orders`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
@@ -144,17 +119,13 @@ export const orderBurgerApi = (data: string[]) =>
     return Promise.reject(data);
   });
 
-type TOrderResponse = TServerResponse<{
-  orders: TOrder[];
-}>;
-
 export const getOrderByNumberApi = (number: number) =>
   fetch(`${URL}/orders/${number}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
     }
-  }).then((res) => checkResponse<TOrderResponse>(res));
+  }).then((res) => checkResponse<TOrdersResponse>(res));
 
 export type TRegisterData = {
   email: string;

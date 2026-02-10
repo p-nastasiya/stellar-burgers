@@ -1,9 +1,9 @@
 import { FC, memo, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useSelector } from '../../services/store';
+import { useSelector } from '../../services';
 import { ingredientsSelector } from '@selectors';
 import { OrderCardProps } from './type';
-import { TIngredient } from '@utils-types';
+import { TIngredient, TOrder } from '@utils-types';
 import { OrderCardUI } from '../ui/order-card';
 
 const maxIngredients = 6;
@@ -13,10 +13,21 @@ export const OrderCard: FC<OrderCardProps> = memo(({ order }) => {
   const navigate = useNavigate();
   const ingredients = useSelector(ingredientsSelector);
 
+  // Валидация заказа
+  const validatedOrder: TOrder = {
+    _id: order._id || '',
+    ingredients: order.ingredients || [],
+    status: order.status || 'created',
+    name: order.name || '',
+    createdAt: order.createdAt || '',
+    updatedAt: order.updatedAt || '',
+    number: order.number || 0
+  };
+
   const orderInfo = useMemo(() => {
     if (!ingredients.length) return null;
 
-    const ingredientsInfo = order.ingredients.reduce(
+    const ingredientsInfo = validatedOrder.ingredients.reduce(
       (acc: TIngredient[], item: string) => {
         const ingredient = ingredients.find((ing) => ing._id === item);
         if (ingredient) return [...acc, ingredient];

@@ -1,5 +1,8 @@
 import { FC, SyntheticEvent, useState, useEffect } from 'react';
-import { useDispatch, useSelector } from '../../services/store';
+import {
+  useAppDispatch as useDispatch,
+  useAppSelector as useSelector
+} from '../../services/hooks';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { resetPassword } from '../../services/slices/userSlice';
 import { userErrorSelector } from '../../services/selectors';

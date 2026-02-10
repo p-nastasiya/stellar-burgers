@@ -1,7 +1,10 @@
 import { FC, SyntheticEvent, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // Используем правильный импорт из нашего store
-import { useDispatch, useSelector } from '../../services/store'; // ✅ Из нашего store
+import {
+  useAppDispatch as useDispatch,
+  useAppSelector as useSelector
+} from '../../services/hooks';
 import { registerUser, clearError } from '../../services/slices/userSlice';
 // Используем селекторы из нашего store
 import { userSelector, userErrorSelector } from '../../services/selectors';

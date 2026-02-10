@@ -20,6 +20,7 @@ export const constructorLoadingSelector = (state: RootState) =>
 export const orderSelector = (state: RootState) => state.order.order;
 export const orderLoadingSelector = (state: RootState) => state.order.isLoading;
 export const orderErrorSelector = (state: RootState) => state.order.error;
+export const userOrdersSelector = (state: RootState) => state.user.orders;
 export const orderModalDataSelector = (state: RootState) =>
   state.order.modalData;
 

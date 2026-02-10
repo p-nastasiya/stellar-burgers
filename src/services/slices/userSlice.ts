@@ -10,9 +10,10 @@ import {
   forgotPasswordApi,
   resetPasswordApi
 } from '@api';
-import { TUser } from '@utils-types';
+import { TOrder, TUser } from '@utils-types';
 import { TUserState } from '../types';
 import { setCookie, getCookie, deleteCookie } from '../../../src/utils/cookie';
+import { fetchUserOrders } from '@actions';
 
 export const loginUser = createAsyncThunk(
   'user/login',
@@ -123,7 +124,8 @@ const initialState: TUserState = {
   user: null,
   isLoading: false,
   error: null,
-  isAuthChecked: false
+  isAuthChecked: false,
+  orders: []
 };
 
 const userSlice = createSlice({
@@ -201,6 +203,19 @@ const userSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      // Заказы пользователя
+      .addCase(fetchUserOrders.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserOrders.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.orders = action.payload;
+      })
+      .addCase(fetchUserOrders.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })

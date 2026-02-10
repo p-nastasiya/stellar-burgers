@@ -1,7 +1,22 @@
+export type TOrder = {
+  _id: string;
+  ingredients: string[];
+  status: 'created' | 'pending' | 'done';
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  number: number;
+};
+
+export type TUser = {
+  email: string;
+  name: string;
+};
+
 export type TIngredient = {
   _id: string;
   name: string;
-  type: string;
+  type: 'bun' | 'main' | 'sauce';
   proteins: number;
   fat: number;
   carbohydrates: number;
@@ -16,25 +31,36 @@ export type TConstructorIngredient = TIngredient & {
   id: string;
 };
 
-export type TOrder = {
-  _id: string;
-  status: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-  number: number;
-  ingredients: string[];
+export type TTabMode = 'bun' | 'main' | 'sauce';
+
+export type TLoginData = {
+  email: string;
+  password: string;
 };
 
-export type TOrdersData = {
+export type TRegisterData = {
+  email: string;
+  password: string;
+  name: string;
+};
+
+export type TFeedsResponse = {
+  success: boolean;
   orders: TOrder[];
   total: number;
   totalToday: number;
 };
 
-export type TUser = {
-  email: string;
-  name: string;
+export type TServerResponse<T> = {
+  success: boolean;
+} & T;
+
+export type TOrdersResponse = {
+  success: boolean;
+  orders: TOrder[];
 };
 
-export type TTabMode = 'bun' | 'sauce' | 'main';
+export type TNewOrderResponse = TServerResponse<{
+  order: TOrder;
+  name: string;
+}>;

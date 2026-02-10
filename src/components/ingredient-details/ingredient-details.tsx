@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector } from '../../services/store';
+import { useSelector } from '../../services';
 import { ingredientsSelector } from '@selectors';
 import { IngredientDetailsUI } from '@ui';
 import { Preloader } from '@ui';

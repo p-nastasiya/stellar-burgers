@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useSelector } from '../../services/store';
+import { useSelector } from '../../services';
 import styles from './constructor-page.module.css';
 import { BurgerIngredients, BurgerConstructor } from '@components';
 import { ingredientsSelector } from '@selectors';
