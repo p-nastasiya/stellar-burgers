@@ -64,23 +64,6 @@ export const BurgerConstructor: FC = () => {
     dispatch(setOrderModalData(null));
   };
 
-  // Функции для работы с ингредиентами
-  const handleMoveUp = (index: number) => {
-    if (index > 0) {
-      dispatch(moveIngredientUp(index));
-    }
-  };
-
-  const handleMoveDown = (index: number) => {
-    if (index < ingredients.length - 1) {
-      dispatch(moveIngredientDown(index));
-    }
-  };
-
-  const handleClose = (id: string) => {
-    dispatch(removeIngredient(id));
-  };
-
   const price = useMemo(
     () =>
       (bun ? bun.price * 2 : 0) +

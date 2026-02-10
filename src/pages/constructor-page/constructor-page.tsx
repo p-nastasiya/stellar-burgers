@@ -7,7 +7,6 @@ import { ingredientsSelector } from '@selectors';
 export const ConstructorPage: FC = () => {
   /** TODO: взять переменную из стора */
   const ingredients = useSelector(ingredientsSelector);
-
   // Если ингредиенты не загружены, компонент не рендерится
   // Прелоадер показывается в App компоненте
   if (ingredients.length === 0) {

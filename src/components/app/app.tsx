@@ -196,6 +196,3 @@ const App = () => (
 );
 
 export default App;
-// function setApiError(arg0: string) {
-//   throw new Error('Function not implemented.');
-// }
