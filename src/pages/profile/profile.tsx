@@ -1,10 +1,14 @@
 import { FC, SyntheticEvent, useState, useEffect, useMemo } from 'react';
 import { ProfileUI } from '@ui-pages';
-import { useSelector } from '../../services';
+import { useSelector, updateUser, useDispatch } from '../../services';
 import { userSelector } from '../../services/selectors';
+import { TRegisterData } from '@api';
+import { AsyncThunkAction, AsyncThunkConfig } from '@reduxjs/toolkit';
+import { TUser } from '@utils-types';
 
 export const Profile: FC = () => {
   const user = useSelector(userSelector);
+  const dispatch = useDispatch();
 
   // Состояние формы
   const [formValue, setFormValue] = useState({
@@ -22,7 +26,7 @@ export const Profile: FC = () => {
         password: ''
       });
     }
-  }, [user]); // user - единственная зависимость
+  }, [user]);
 
   // Проверяем, изменилась ли форма
   const isFormChanged = useMemo(() => {
@@ -37,7 +41,33 @@ export const Profile: FC = () => {
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
     // TODO: добавить логику сохранения
+    const updatedData: Partial<TRegisterData> = {};
+
+    if (formValue.name !== user?.name) {
+      updatedData.name = formValue.name;
+    }
+    if (formValue.email !== user?.email) {
+      updatedData.email = formValue.email;
+    }
+    if (formValue.password) {
+      updatedData.password = formValue.password;
+    }
     console.log('Сохранение данных:', formValue);
+
+    // Отправляем запрос на обновление
+    dispatch(updateUser(updatedData))
+      .unwrap()
+      .then(() => {
+        console.log('Данные успешно обновлены');
+        // Очищаем поле пароля после успешного обновления
+        setFormValue((prevState) => ({
+          ...prevState,
+          password: ''
+        }));
+      })
+      .catch((error: any) => {
+        console.error('Ошибка при обновлении данных:', error);
+      });
   };
 
   const handleCancel = (e: SyntheticEvent) => {
@@ -65,6 +95,15 @@ export const Profile: FC = () => {
       handleCancel={handleCancel}
       handleSubmit={handleSubmit}
       handleInputChange={handleInputChange}
+      handleLogout={function (): void {
+        throw new Error('Function not implemented.');
+      }}
     />
   );
 };
+
+function dispatch(
+  _arg0: AsyncThunkAction<TUser, Partial<TRegisterData>, AsyncThunkConfig>
+) {
+  throw new Error('Function not implemented.');
+}

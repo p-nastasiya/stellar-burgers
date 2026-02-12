@@ -76,13 +76,7 @@ const AppContent = () => {
   useEffect(() => {
     dispatch(fetchIngredients())
       .unwrap()
-      .catch((error) => {
-        console.error('Ошибка загрузки ингредиентов:', error);
-        setApiError(
-          'Не удалось загрузить ингредиентов. Проверьте подключение к интернету.'
-        );
-      });
-
+      .finally(() => dispatch(setAuthChecked(true)));
     // Проверяем авторизацию при загрузке
     const token = localStorage.getItem('refreshToken');
     if (token) {

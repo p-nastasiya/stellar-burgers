@@ -1,11 +1,24 @@
 import { FC } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from '../../services/store';
+import { logoutUser } from '../../services/slices/userSlice';
 import { ProfileMenuUI } from '@ui';
 
 export const ProfileMenu: FC = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleLogout = () => {};
+  const handleLogout = () => {
+    dispatch(logoutUser())
+      .unwrap()
+      .then(() => {
+        navigate('/login');
+      })
+      .catch((error) => {
+        console.error('Ошибка при выходе из системы:', error);
+      });
+  };
 
   return <ProfileMenuUI handleLogout={handleLogout} pathname={pathname} />;
 };

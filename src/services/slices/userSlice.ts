@@ -20,8 +20,7 @@ export const loginUser = createAsyncThunk(
   async (data: TLoginData, { rejectWithValue }) => {
     try {
       const response = await loginUserApi(data);
-      const accessToken = response.accessToken.replace('Bearer ', '');
-      setCookie('accessToken', accessToken);
+      setCookie('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
       return response.user;
     } catch (error: any) {
@@ -35,8 +34,7 @@ export const registerUser = createAsyncThunk(
   async (data: TRegisterData, { rejectWithValue }) => {
     try {
       const response = await registerUserApi(data);
-      const accessToken = response.accessToken.replace('Bearer ', '');
-      setCookie('accessToken', accessToken);
+      setCookie('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
       return response.user;
     } catch (error: any) {
@@ -62,25 +60,10 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
-export const fetchUser = createAsyncThunk(
-  'user/fetch',
-  async (_, { rejectWithValue }) => {
-    try {
-      const token = getCookie('accessToken');
-      if (!token) {
-        throw new Error('Токен отсутствует');
-      }
-      const response = await getUserApi();
-      return response.user;
-    } catch (error: any) {
-      // При 401 ошибке просто возвращаем null
-      if (error.message === 'jwt expired' || error.message === '401') {
-        return rejectWithValue('Токен истек');
-      }
-      return rejectWithValue(error.message || 'Ошибка получения пользователя');
-    }
-  }
-);
+export const fetchUser = createAsyncThunk('user/fetch', async () => {
+  const response = await getUserApi();
+  return response.user;
+});
 
 export const updateUser = createAsyncThunk(
   'user/update',
@@ -152,7 +135,7 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
-        state.isAuthChecked = true;
+        //state.isAuthChecked = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -166,17 +149,27 @@ const userSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
-        state.isAuthChecked = true;
+        //state.isAuthChecked = true;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })
+
       // Выход
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
-        state.isAuthChecked = true;
+        //state.isAuthChecked = true;
+        state.isLoading = false;
+        state.error = null;
       })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.user = null;
+        //state.isAuthChecked = true;
+        state.isLoading = false;
+        // Даже при ошибке выходим
+      })
+
       // Получение пользователя
       .addCase(fetchUser.pending, (state) => {
         state.isLoading = true;
@@ -185,12 +178,12 @@ const userSlice = createSlice({
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
-        state.isAuthChecked = true;
+        //state.isAuthChecked = true;
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
-        state.isAuthChecked = true;
+        //state.isAuthChecked = true;
         state.error = action.payload as string;
       })
       // Обновление пользователя
@@ -201,6 +194,7 @@ const userSlice = createSlice({
       .addCase(updateUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
+        state.error = null;
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.isLoading = false;

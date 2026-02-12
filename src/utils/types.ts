@@ -9,6 +9,7 @@ export type TOrder = {
 };
 
 export type TUser = {
+	user: { email: string; name: string; } | null;
   email: string;
   name: string;
 };

@@ -19,8 +19,7 @@ export const loginUser = createAsyncThunk(
   async (data: TLoginData, { rejectWithValue }) => {
     try {
       const response = await loginUserApi(data);
-      const accessToken = response.accessToken.replace('Bearer ', '');
-      setCookie('accessToken', accessToken);
+      setCookie('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
       return response.user;
     } catch (error: any) {
@@ -34,8 +33,7 @@ export const registerUser = createAsyncThunk(
   async (data: TRegisterData, { rejectWithValue }) => {
     try {
       const response = await registerUserApi(data);
-      const accessToken = response.accessToken.replace('Bearer ', '');
-      setCookie('accessToken', accessToken);
+      setCookie('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
       return response.user;
     } catch (error: any) {
@@ -91,8 +89,6 @@ export const updateUser = createAsyncThunk(
     }
   }
 );
-
-// НОВЫЕ ЭКШЕНЫ
 
 export const fetchUserOrders = createAsyncThunk(
   'user/fetchOrders',

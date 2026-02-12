@@ -14,23 +14,11 @@ export const Feed: FC = () => {
 
   useEffect(() => {
     dispatch(fetchFeeds());
-
-    // WebSocket подключение для реальных обновлений
-    const ws = new WebSocket('wss://norma.nomoreparties.space/orders/all');
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      // Обновляем данные в сторе
-    };
-
-    return () => {
-      ws.close();
-    };
   }, [dispatch]);
 
   if (!orders.length) {
     return <Preloader />;
   }
 
-  <FeedUI orders={orders} handleGetFeeds={() => {}} />;
+  return <FeedUI orders={orders} handleGetFeeds={() => {}} />;
 };
