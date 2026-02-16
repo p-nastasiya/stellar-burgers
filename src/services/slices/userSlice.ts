@@ -135,11 +135,12 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
-        //state.isAuthChecked = true;
+        state.isAuthChecked = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+        state.isAuthChecked = true;
       })
       // Регистрация
       .addCase(registerUser.pending, (state) => {
@@ -149,23 +150,24 @@ const userSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
-        //state.isAuthChecked = true;
+        state.isAuthChecked = true;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+        state.isAuthChecked = true;
       })
 
       // Выход
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
-        //state.isAuthChecked = true;
+        state.isAuthChecked = true;
         state.isLoading = false;
         state.error = null;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.user = null;
-        //state.isAuthChecked = true;
+        state.isAuthChecked = true;
         state.isLoading = false;
         // Даже при ошибке выходим
       })
@@ -178,12 +180,12 @@ const userSlice = createSlice({
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
-        //state.isAuthChecked = true;
+        state.isAuthChecked = true;
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
-        //state.isAuthChecked = true;
+        state.isAuthChecked = true;
         state.error = action.payload as string;
       })
       // Обновление пользователя

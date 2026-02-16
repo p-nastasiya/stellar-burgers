@@ -32,68 +32,54 @@ import { ConstructorPage } from '../../pages/constructor-page/constructor-page';
 import { Modal } from '@components';
 import { IngredientDetails } from '@components';
 import { OrderInfo } from '@components';
-//import { Preloader } from '@ui';
-//import { ingredientsLoadingSelector, isAuthCheckedSelector } from '@selectors';
+import { Preloader } from '@ui';
+import { ingredientsLoadingSelector, isAuthCheckedSelector } from '@selectors';
 
-// Компонент для отображения ингредиента в модалке
-const IngredientDetailsModal: FC = () => {
-  const navigate = useNavigate();
-
-  const handleClose = () => {
-    navigate(-1);
-  };
-
-  return (
-    <Modal title='Детали ингредиента' onClose={handleClose}>
-      <IngredientDetails />
-    </Modal>
-  );
-};
-
-// Компонент для отображения заказа в модалке
-const OrderInfoModal: FC = () => {
-  const navigate = useNavigate();
-
-  const handleClose = () => {
-    navigate(-1);
-  };
-
-  return (
-    <Modal title='' onClose={handleClose}>
-      <OrderInfo />
-    </Modal>
-  );
-};
-
-// Внутренний компонент App
 const AppContent = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const background = location.state?.background;
   const dispatch = useDispatch();
-  //const isLoading = useSelector(ingredientsLoadingSelector);
-  const [apiError, setApiError] = useState<string | null>(null);
+
+  const isLoading = useSelector(ingredientsLoadingSelector);
+  const isAuthChecked = useSelector(isAuthCheckedSelector);
+
+  const handleModalClose = () => {
+    navigate(-1);
+  };
 
   useEffect(() => {
-    dispatch(fetchIngredients())
-      .unwrap()
-      .finally(() => dispatch(setAuthChecked(true)));
-    // Проверяем авторизацию при загрузке
+    dispatch(fetchIngredients());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Проверяем авторизацию отдельно
     const token = localStorage.getItem('refreshToken');
     if (token) {
-      dispatch(fetchUser());
+      dispatch(fetchUser()).finally(() => dispatch(setAuthChecked(true)));
     } else {
       dispatch(setAuthChecked(true));
     }
   }, [dispatch]);
+
+  // Показываем прелоадер, пока не проверили авторизацию И не загрузили ингредиенты
+  if (!isAuthChecked || isLoading) {
+    return (
+      <div className={styles.app}>
+        <AppHeader />
+        <Preloader />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.app}>
       <AppHeader />
       <Routes location={background || location}>
         <Route path='/' element={<ConstructorPage />} />
-        {/* {/* Основные публичные маршруты */}
         <Route path='/feed' element={<Feed />} />
 
-        {/* Маршруты для неавторизованных пользователей (только для гостей) */}
+        {/* Маршруты для неавторизованных */}
         <Route
           path='/login'
           element={
@@ -127,7 +113,7 @@ const AppContent = () => {
           }
         />
 
-        {/* Маршруты для авторизованных пользователей (требуют аутентификации) */}
+        {/* Маршруты для авторизованных */}
         <Route
           path='/profile'
           element={
@@ -145,7 +131,7 @@ const AppContent = () => {
           }
         />
 
-        {/* Детальные страницы (могут открываться как отдельные страницы) */}
+        {/* Детальные страницы */}
         <Route path='/ingredients/:id' element={<IngredientDetails />} />
         <Route path='/feed/:number' element={<OrderInfo />} />
         <Route
@@ -157,22 +143,35 @@ const AppContent = () => {
           }
         />
 
-        {/* Резервный маршрут для 404 ошибки */}
         <Route path='*' element={<NotFound404 />} />
       </Routes>
 
-      {/* Модальные окна, которые отображаются поверх основного контента 
-    при наличии фона (background) из истории навигации */}
+      {/* Модальные окна */}
       {background && (
         <Routes>
-          {/* Те же маршруты, но с модальными версиями компонентов */}
-          <Route path='/ingredients/:id' element={<IngredientDetailsModal />} />
-          <Route path='/feed/:number' element={<OrderInfoModal />} />
+          <Route
+            path='/ingredients/:id'
+            element={
+              <Modal title='Детали ингредиента' onClose={handleModalClose}>
+                <IngredientDetails />
+              </Modal>
+            }
+          />
+          <Route
+            path='/feed/:number'
+            element={
+              <Modal title='Детали заказа' onClose={handleModalClose}>
+                <OrderInfo />
+              </Modal>
+            }
+          />
           <Route
             path='/profile/orders/:number'
             element={
               <OnlyAuth>
-                <OrderInfoModal />
+                <Modal title='Детали заказа' onClose={handleModalClose}>
+                  <OrderInfo />
+                </Modal>
               </OnlyAuth>
             }
           />
@@ -182,7 +181,6 @@ const AppContent = () => {
   );
 };
 
-// Главный компонент App
 const App = () => (
   <BrowserRouter>
     <AppContent />

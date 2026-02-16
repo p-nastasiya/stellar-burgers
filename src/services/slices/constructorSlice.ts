@@ -17,19 +17,27 @@ const constructorSlice = createSlice({
     addBun: (state, action: PayloadAction<TIngredient>) => {
       state.bun = action.payload;
     },
-    addIngredient: (state, action: PayloadAction<TIngredient>) => {
-      const newIngredient: TConstructorIngredient = {
-        ...action.payload,
-        id: uuidv4(),
-        __v: 0
-      };
-      state.ingredients.push(newIngredient);
+
+    // Исправлено: используем prepare для генерации id
+    addIngredient: {
+      reducer: (state, action: PayloadAction<TConstructorIngredient>) => {
+        state.ingredients.push(action.payload);
+      },
+      prepare: (ingredient: TIngredient) => ({
+        payload: {
+          ...ingredient,
+          id: uuidv4(),
+          __v: 0
+        }
+      })
     },
+
     removeIngredient: (state, action: PayloadAction<string>) => {
       state.ingredients = state.ingredients.filter(
         (item) => item.id !== action.payload
       );
     },
+
     moveIngredientUp: (state, action: PayloadAction<number>) => {
       const index = action.payload;
       if (index > 0) {
@@ -39,6 +47,7 @@ const constructorSlice = createSlice({
         ];
       }
     },
+
     moveIngredientDown: (state, action: PayloadAction<number>) => {
       const index = action.payload;
       if (index < state.ingredients.length - 1) {
@@ -48,6 +57,7 @@ const constructorSlice = createSlice({
         ];
       }
     },
+
     clearConstructor: (state) => {
       state.bun = null;
       state.ingredients = [];
